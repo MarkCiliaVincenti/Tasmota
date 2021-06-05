@@ -789,7 +789,7 @@ void TuyaProcessStatePacket(void) {
         if (PowerOff) { Tuya.ignore_dimmer_cmd_timeout = millis() + 250; }
       }
       else if (Tuya.buffer[dpidStart + 1] == 2) {  // Data Type 2
-        uint16_t packetValue = Tuya.buffer[dpidStart + 6] << 8 | Tuya.buffer[dpidStart + 7];
+        uint32_t packetValue = Tuya.buffer[dpidStart + 4] << 24 | Tuya.buffer[dpidStart + 5] << 16 | Tuya.buffer[dpidStart + 6] << 8 | Tuya.buffer[dpidStart + 7]; // TYpe 2 is a 32 bit integer
         uint8_t dimIndex;
         bool SnsUpdate = false;
 
@@ -880,7 +880,6 @@ void TuyaProcessStatePacket(void) {
           Energy.current[0] = (float)packetValue / 1000;
           AddLog(LOG_LEVEL_DEBUG, PSTR("TYA: Rx ID=%d Current=%d"), Tuya.buffer[dpidStart], packetValue);
         } else if (tuya_energy_enabled && fnId == TUYA_MCU_FUNC_POWER) {
-          uint32_t packetValue = Tuya.buffer[dpidStart + 5] << 16 |Tuya.buffer[dpidStart + 6] << 8 | Tuya.buffer[dpidStart + 7];
           Energy.active_power[0] = (float)packetValue / 10;
           AddLog(LOG_LEVEL_DEBUG, PSTR("TYA: Rx ID=%d Active_Power=%d"), Tuya.buffer[dpidStart], packetValue);
 
@@ -1228,7 +1227,7 @@ void TuyaSerialInput(void)
       if (Settings.flag3.tuya_serial_mqtt_publish) {  // SetOption66 - Enable TuyaMcuReceived messages over Mqtt
         MqttPublishPrefixTopic_P(RESULT_OR_TELE, PSTR(D_JSON_TUYA_MCU_RECEIVED));
       } else {
-        AddLog_P(LOG_LEVEL_DEBUG, TasmotaGlobal.mqtt_data);
+        AddLog(LOG_LEVEL_DEBUG, TasmotaGlobal.mqtt_data);
       }
       XdrvRulesProcess(0);
 

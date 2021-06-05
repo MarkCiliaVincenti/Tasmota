@@ -240,7 +240,7 @@ void CommandHandler(char* topicBuf, char* dataBuf, uint32_t data_len)
     }
   }
 
-  AddLog_P(LOG_LEVEL_DEBUG, PSTR("CMD: Grp %d, Cmnd '%s', Idx %d, Len %d, Data '%s'"),
+  AddLog(LOG_LEVEL_DEBUG, PSTR("CMD: Grp %d, Cmnd '%s', Idx %d, Len %d, Data '%s'"),
     grpflg, type, index, data_len, (binary_data) ? HexToString((uint8_t*)dataBuf, data_len).c_str() : dataBuf);
 
   if (type != nullptr) {
@@ -409,23 +409,20 @@ void CmndPower(void)
   }
 }
 
-bool all_in_one = false;
-
 void CmndStatusResponse(uint32_t index) {
   static String all_status = (const char*) nullptr;
 
-  if (all_in_one) {
+  if (0 == XdrvMailbox.index) {  // Command status0
     if (99 == index) {
       all_status.replace("}{", ",");
       char cmnd_status[10];  // STATUS11
       snprintf_P(cmnd_status, sizeof(cmnd_status), PSTR(D_CMND_STATUS "0"));
-      MqttPublishPayloadPrefixTopic_P(STAT, cmnd_status, all_status.c_str());
+      MqttPublishPayloadPrefixTopicRulesProcess_P(STAT, cmnd_status, all_status.c_str());
       all_status = (const char*) nullptr;
+    } else {
+      if (0 == index) { all_status = ""; }
+      all_status += TasmotaGlobal.mqtt_data;
     }
-    if (0 == index) {
-      all_status = "";
-    }
-    all_status += TasmotaGlobal.mqtt_data;
   }
   else if (index < 99) {
     char cmnd_status[10];  // STATUS11
@@ -439,8 +436,7 @@ void CmndStatus(void)
 {
   int32_t payload = XdrvMailbox.payload;
 
-  all_in_one = (0 == XdrvMailbox.index);
-  if (all_in_one) { payload = 0; }
+  if (0 == XdrvMailbox.index) { payload = 0; }  // All status messages in one MQTT message (status0)
 
   if (payload > MAX_STATUS) { return; }  // {"Command":"Error"}
   if (!Settings.flag.mqtt_enabled && (6 == payload)) { return; }  // SetOption3 - Enable MQTT
@@ -2146,8 +2142,12 @@ void CmndWifi(void)
   if ((XdrvMailbox.payload >= 0) && (XdrvMailbox.payload <= 1)) {
     Settings.flag4.network_wifi = XdrvMailbox.payload;
     if (Settings.flag4.network_wifi) { WifiEnable(); }
+#ifdef ESP8266
+  } else if ((XdrvMailbox.payload >= 2) && (XdrvMailbox.payload <= 4)) {
+    WiFi.setPhyMode(WiFiPhyMode_t(XdrvMailbox.payload - 1));  // 1-B/2-BG/3-BGN
+#endif
   }
-  ResponseCmndStateText(Settings.flag4.network_wifi);
+  Response_P(PSTR("{\"" D_JSON_WIFI "\":\"%s\",\"" D_JSON_WIFI_MODE "\":\"11%c\"}"), GetStateText(Settings.flag4.network_wifi), pgm_read_byte(&kWifiPhyMode[WiFi.getPhyMode() & 0x3]) );
 }
 
 #ifdef USE_I2C
