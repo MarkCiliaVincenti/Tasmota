@@ -54,9 +54,9 @@
 
 // -- Optional light modules ----------------------
 #undef USE_WS2812                               // WS2812 Led string using library NeoPixelBus (+5k code, +1k mem, 232 iram) - Disable by //
-  #undef USE_WS2812_RMT  0                      // ESP32 only, hardware RMT support (default). Specify the RMT channel 0..7. This should be preferred to software bit bang.
-  #undef USE_WS2812_HARDWARE  NEO_HW_WS2812     // Hardware type (NEO_HW_WS2812, NEO_HW_WS2812X, NEO_HW_WS2813, NEO_HW_SK6812, NEO_HW_LC8812, NEO_HW_APA106, NEO_HW_P9813)
-  #undef USE_WS2812_CTYPE     NEO_GRB           // Color type (NEO_RGB, NEO_GRB, NEO_BRG, NEO_RBG, NEO_RGBW, NEO_GRBW)
+  #undef USE_WS2812_RMT                      // ESP32 only, hardware RMT support (default). Specify the RMT channel 0..7. This should be preferred to software bit bang.
+  #undef USE_WS2812_HARDWARE     // Hardware type (NEO_HW_WS2812, NEO_HW_WS2812X, NEO_HW_WS2813, NEO_HW_SK6812, NEO_HW_LC8812, NEO_HW_APA106, NEO_HW_P9813)
+  #undef USE_WS2812_CTYPE           // Color type (NEO_RGB, NEO_GRB, NEO_BRG, NEO_RBG, NEO_RGBW, NEO_GRBW)
 #undef USE_MY92X1                               // Add support for MY92X1 RGBCW led controller as used in Sonoff B1, Ailight and Lohas
 #undef USE_SM16716                              // Add support for SM16716 RGB LED controller (+0k7 code)
 #undef USE_SM2135                               // Add support for SM2135 RGBCW led control as used in Action LSC (+0k6 code)
@@ -75,12 +75,12 @@
 
 // -- I2C sensors ---------------------------------
 #undef USE_I2C                                  // I2C using library wire (+10k code, 0k2 mem, 124 iram)
-    #undef USE_VEML6070_RSET    270000          // VEML6070, Rset in Ohm used on PCB board, default 270K = 270000ohm, range for this sensor: 220K ... 1Meg
+    #undef USE_VEML6070_RSET         // VEML6070, Rset in Ohm used on PCB board, default 270K = 270000ohm, range for this sensor: 220K ... 1Meg
     #undef USE_VEML6070_SHOW_RAW                // VEML6070, shows the raw value of UV-A
     #undef USE_APDS9960_GESTURE                   // Enable APDS9960 Gesture feature (+2k code)
     #undef USE_APDS9960_PROXIMITY                 // Enable APDS9960 Proximity feature (>50 code)
     #undef USE_APDS9960_COLOR                     // Enable APDS9960 Color feature (+0.8k code)
-    #undef USE_APDS9960_STARTMODE  0              // Default to enable Gesture mode
+    #undef USE_APDS9960_STARTMODE             // Default to enable Gesture mode
   #undef USE_ADE7953                            // [I2cDriver7] Enable ADE7953 Energy monitor as used on Shelly 2.5 (I2C address 0x38) (+1k5)
     #undef USE_DISPLAY_MODES1TO5                // Enable display mode 1 to 5 in addition to mode 0
     #undef USE_DISPLAY_LCD                      // [DisplayModel 1] [I2cDriver3] Enable Lcd display (I2C addresses 0x27 and 0x3F) (+6k code)
