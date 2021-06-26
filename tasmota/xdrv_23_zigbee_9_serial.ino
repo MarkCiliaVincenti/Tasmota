@@ -149,10 +149,14 @@ void ZigbeeInputLoop(void) {
 			SBuffer znp_buffer = zigbee_buffer->subBuffer(2, zigbee_frame_len - 3);	// remove SOF, LEN and FCS
 
       Response_P(PSTR("{\"" D_JSON_ZIGBEEZNPRECEIVED "\":\"%_B\"}"), &znp_buffer);
-      if (Settings.flag3.tuya_serial_mqtt_publish) {
+      if (Settings->flag3.tuya_serial_mqtt_publish) {
         MqttPublishPrefixTopicRulesProcess_P(TELE, PSTR(D_RSLT_SENSOR));
       } else {
+#ifdef MQTT_DATA_STRING
+        AddLog(LOG_LEVEL_DEBUG, PSTR(D_LOG_ZIGBEE "%s"), TasmotaGlobal.mqtt_data.c_str());
+#else
         AddLog(LOG_LEVEL_DEBUG, PSTR(D_LOG_ZIGBEE "%s"), TasmotaGlobal.mqtt_data);
+#endif        
       }
 			// now process the message
       ZigbeeProcessInput(znp_buffer);
@@ -563,7 +567,7 @@ void ZigbeeProcessInputEZSP(SBuffer &buf) {
 
   // log message
   Response_P(PSTR("{\"" D_JSON_ZIGBEE_EZSP_RECEIVED "\":\"%_B\"}"), &buf);
-  if (Settings.flag3.tuya_serial_mqtt_publish) {
+  if (Settings->flag3.tuya_serial_mqtt_publish) {
     MqttPublishPrefixTopicRulesProcess_P(TELE, PSTR(D_RSLT_SENSOR));
   } else {
     // demote less interesting messages to LOG_LEVEL_DEBUG
@@ -597,7 +601,11 @@ void ZigbeeProcessInputEZSP(SBuffer &buf) {
         log_level = LOG_LEVEL_DEBUG;
         break;
     }
+#ifdef MQTT_DATA_STRING
+    AddLog(log_level, PSTR(D_LOG_ZIGBEE "%s"), TasmotaGlobal.mqtt_data.c_str());    // TODO move to LOG_LEVEL_DEBUG when stable
+#else
     AddLog(log_level, PSTR(D_LOG_ZIGBEE "%s"), TasmotaGlobal.mqtt_data);    // TODO move to LOG_LEVEL_DEBUG when stable
+#endif    
   }
 
   // Pass message to state machine

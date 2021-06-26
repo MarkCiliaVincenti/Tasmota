@@ -60,7 +60,7 @@ uint32_t MqttFileUploadValidate(uint32_t rcv_id) {
 
     // Check buffer size
     if (UPL_SETTINGS == FMqtt.file_type) {
-      if (FMqtt.file_size > sizeof(Settings)) {
+      if (FMqtt.file_size > sizeof(TSettings)) {
         return 2;                                            // Settings supports max 4k size
       }
     } else {                                                 // Check enough flash space for intermediate upload
@@ -377,6 +377,9 @@ void CmndFileDownload(void) {
 */
   if (FMqtt.file_buffer) {
     if (FMqtt.file_pos < FMqtt.file_size) {
+#ifdef USE_TASMESH
+      uint32_t chunk_size = 2048;
+#else
       uint32_t chunk_size = 4096;
       if (!FMqtt.file_binary) {
         /*
@@ -386,6 +389,7 @@ void CmndFileDownload(void) {
         */
         chunk_size = (((ResponseSize() - FileTransferHeaderSize) / 4) * 3) -2;
       }
+#endif
       uint32_t bytes_left = FMqtt.file_size - FMqtt.file_pos;
       uint32_t write_bytes = (bytes_left < chunk_size) ? bytes_left : chunk_size;
       uint8_t* buffer = FMqtt.file_buffer + FMqtt.file_pos;
@@ -400,6 +404,9 @@ void CmndFileDownload(void) {
         char* base64_data = (char*)malloc(encode_base64_length(write_bytes) +2);
         if (base64_data) {
           Response_P(PSTR("{\"Id\":%d,\"Data\":\""), FMqtt.file_id);  // FileTransferHeaderSize
+
+          SHOW_FREE_MEM(PSTR("CmndFileDownload"));
+
           encode_base64((unsigned char*)buffer, write_bytes, (unsigned char*)base64_data);
           ResponseAppend_P(base64_data);
           ResponseAppend_P("\"}");
