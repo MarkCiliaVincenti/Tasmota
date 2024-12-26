@@ -101,6 +101,15 @@
 // -- MQTT ----------------------------------------
 #define MQTT_USE               true              // [SetOption3] Select default MQTT use (false = Off, true = On)
 
+
+#ifndef USE_MQTT_TLS 
+#define USE_MQTT_TLS                             // Use TLS for MQTT connection (+34.5k code, +7.0k mem and +4.8k additional during connection handshake)
+#define MQTT_TLS_ENABLED       true              // [SetOption103] Enable TLS mode (requires TLS version)
+#define USE_MQTT_TLS_CA_CERT                     // Force full CA validation instead of fingerprints, slower, but simpler to use.  (+2.2k code, +1.9k mem during connection handshake)
+                                                 // This includes the LetsEncrypt CA in tasmota_ca.ino for verifying server certificates
+//  #define USE_MQTT_TLS_FORCE_EC_CIPHER           // Force Elliptic Curve cipher (higher security) required by some servers (automatically enabled with USE_MQTT_AWS_IOT) (+11.4k code, +0.4k mem)
+#endif
+
 #define MQTT_KEEPALIVE         30                // [MqttKeepAlive] Number of seconds between KeepAlive messages
 #define MQTT_SOCKET_TIMEOUT    4                 // [MqttTimeout] Number of seconds before Mqtt connection timeout
 #define MQTT_WIFI_CLIENT_TIMEOUT 200             // [MqttWifiTimeout] Number of milliseconds before Mqtt Wi-Fi timeout
@@ -108,7 +117,7 @@
 #define MQTT_HOST              ""                // [MqttHost]
 #define MQTT_FINGERPRINT1      0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00  // [MqttFingerprint1] (auto-learn)
 #define MQTT_FINGERPRINT2      0xDA,0x39,0xA3,0xEE,0x5E,0x6B,0x4B,0x0D,0x32,0x55,0xBF,0xEF,0x95,0x60,0x18,0x90,0xAF,0xD8,0x07,0x09  // [MqttFingerprint2] (invalid)
-#define MQTT_PORT              1883              // [MqttPort] MQTT port (10123 on CloudMQTT)
+#define MQTT_PORT              8883              // [MqttPort] MQTT port (10123 on CloudMQTT)
 #define MQTT_USER              "DVES_USER"       // [MqttUser] MQTT user
 #define MQTT_PASS              "DVES_PASS"       // [MqttPassword] MQTT password
 
@@ -144,7 +153,7 @@
 #define MQTT_CLIENT_ID         "DVES_%06X"       // [MqttClient] Also fall back topic using last 6 characters of MAC address or use "DVES_%12X" for complete MAC address
 
 // -- MQTT - Telemetry ----------------------------
-#define TELE_PERIOD            300               // [TelePeriod] Telemetry (0 = disable, 10 - 3600 seconds)
+#define TELE_PERIOD            10                // [TelePeriod] Telemetry (0 = disable, 10 - 3600 seconds)
 #define TELE_ON_POWER          false             // [SetOption59] send tele/STATE together with stat/RESULT (false = Disable, true = Enable)
 
 // -- MQTT - Domoticz -----------------------------
